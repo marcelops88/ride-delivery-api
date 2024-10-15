@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  mongo:
+    image: mongo
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+
+  rabbitmq:
+    image: rabbitmq:management
+    ports:
+      - "5672:5672"    # Porta padrão do RabbitMQ
+      - "15672:15672"  # Porta da interface de gerenciamento
+    environment:
+      RABBITMQ_DEFAULT_USER: rideanddeliver
+      RABBITMQ_DEFAULT_PASS: rideanddeliver01
+
+  vendas-api:
+    build: .
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mongo
+      - rabbitmq
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      ConnectionStrings__MongoDB: "mongodb://mongo:27017/rideanddeliverdb" # String de conexão para o MongoDB
+      RabbitMQ__Host: "rabbitmq" # Host do RabbitMQ
+      RabbitMQ__Username: "rideanddeliver"  # Usuário do RabbitMQ
+      RabbitMQ__Password: "rideanddeliver01"  # Senha do RabbitMQ
+    links:
+      - mongo
+      - rabbitmq
+
+volumes:
+  mongo_data:
