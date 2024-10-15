@@ -4,6 +4,9 @@ namespace Domain.Entities
 {
     public class Entregador : EntityBase
     {
+        [BsonElement("identificador")]
+        public string Identificador { get; set; }
+
         [BsonElement("nome")]
         public string Nome { get; set; }
 
