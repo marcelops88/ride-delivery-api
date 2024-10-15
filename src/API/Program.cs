@@ -71,7 +71,7 @@ namespace API
                         Name = "Equipe RideAndDeliver",
                         Email = "suporte@rideanddeliver.com.br",
                     },
-                        Extensions = new Dictionary<string, IOpenApiExtension>
+                    Extensions = new Dictionary<string, IOpenApiExtension>
                 {
                     {
                         "x-logo", new OpenApiObject
