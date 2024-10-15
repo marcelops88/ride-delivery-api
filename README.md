@@ -2,7 +2,7 @@
 
 ## Descrição
 
-MotoHub é uma aplicação desenvolvida para gerenciar o aluguel de motos e entregadores, permitindo que entregadores registrados com uma locação ativa possam efetuar entregas de pedidos disponíveis na plataforma.
+RideAndDeliver é uma aplicação desenvolvida para gerenciar o aluguel de motos e entregadores, permitindo que entregadores registrados com uma locação ativa possam efetuar entregas de pedidos disponíveis na plataforma.
 
 ## Tecnologias Utilizadas
 
@@ -14,16 +14,18 @@ MotoHub é uma aplicação desenvolvida para gerenciar o aluguel de motos e entr
 
 ## Funcionalidades
 
-- Gerenciamento de entregadores
-  - Registro de entregadores
-  - Atualização de status de locação
-- Gerenciamento de motos
-  - Registro de motos disponíveis para locação
-  - Aluguel de motos para entregadores
-- Gerenciamento de pedidos
-  - Listagem de pedidos disponíveis para entrega
-  - Atribuição de entregas a entregadores com locação ativa
-- Sistema de Mensageria para comunicação entre os serviços
+- **Motos**
+  - Cadastro de novas motos
+  - Modificação da placa de motos
+  - Remoção de motos
+  - Consulta de motos por ID
+- **Entregadores**
+  - Registro de novos entregadores
+  - Envio da CNH dos entregadores
+- **Locação**
+  - Aluguel de motos
+  - Consulta de locações por ID
+  - Devolução de motos e cálculo de valor
 
 ## Estrutura de API
 
@@ -31,29 +33,28 @@ A aplicação segue o padrão **RESTful** e os endpoints estão documentados con
 
 ### Endpoints:
 
-- **Entregadores:**
-  - `POST /entregadores`: Registrar novo entregador
-  - `GET /entregadores`: Listar todos os entregadores
-  - `PUT /entregadores/{id}`: Atualizar dados do entregador
-  - `DELETE /entregadores/{id}`: Remover entregador
+#### **Motos**
+- `POST /motos`: Cadastrar uma nova moto
+- `GET /motos`: Consultar motos existentes
+- `PUT /motos/{id}/placa`: Modificar a placa de uma moto
+- `GET /motos/{id}`: Consultar moto existente por ID
+- `DELETE /motos/{id}`: Remover uma moto
 
-- **Motos:**
-  - `POST /motos`: Registrar nova moto para locação
-  - `GET /motos`: Listar todas as motos
-  - `PUT /motos/{id}`: Atualizar status da moto (alugada/disponível)
-  - `DELETE /motos/{id}`: Remover moto
+#### **Entregadores**
+- `POST /entregadores`: Cadastrar entregador
+- `POST /entregadores/{id}/cnh`: Enviar foto da CNH do entregador
 
-- **Pedidos:**
-  - `GET /pedidos`: Listar pedidos disponíveis para entrega
-  - `PUT /pedidos/{id}`: Atribuir pedido a entregador com locação ativa
+#### **Locação**
+- `POST /locacao`: Alugar uma moto
+- `GET /locacao/{id}`: Consultar locação por ID
+- `PUT /locacao/{id}/devolucao`: Informar data de devolução e calcular valor de aluguel
 
 ### Exemplo de Request/Response
 
 ```json
-POST /entregadores
+POST /motos
 {
-  "nome": "João Silva",
-  "cpf": "123.456.789-00",
-  "email": "joao.silva@example.com",
-  "telefone": "(11) 99999-9999"
+  "modelo": "Honda CB500",
+  "placa": "ABC-1234",
+  "cor": "Vermelho"
 }
