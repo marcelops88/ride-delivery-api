@@ -1,0 +1,56 @@
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+[Ll]og/
+[Ll]ogs/
+*.dll
+*.exe
+*.pdb
+*.obj
+*.lib
+*.so
+*.dylib
+*.nupkg
+*.snupkg
+
+# User-specific files
+*.user
+*.userosscache
+*.suo
+*.sln.docstates
+
+# Rider project files
+.idea/
+
+# VS Code directories
+.vscode/
+
+# NuGet
+*.nupkg
+*.snupkg
+.nuget/
+packages/
+/.vs/VendaHubAPI/FileContentIndex/20c05ba4-4ff1-4981-bff6-1dc415819925.vsidx
+/.vs/VendaHubAPI/FileContentIndex/9d7815aa-bf2b-409b-8a54-561448d0a305.vsidx
+/.vs/VendaHubAPI/FileContentIndex/a64670f0-1840-48c3-9c52-9b306567bbf5.vsidx
+/.vs/VendaHubAPI/FileContentIndex/c24e993f-ab2d-475b-8845-094425e0696c.vsidx
+/.vs/VendaHubAPI/FileContentIndex/6fe73cf3-4a5f-4ae4-bd06-baebdc5538c1.vsidx
+/.vs/VendaHubAPI/FileContentIndex
+/.vs/VendaHubAPI/v17/.wsuo
+/.vs/VendaHubAPI/v17/DocumentLayout.json
+/.vs/slnx.sqlite
+/.vs
+/src/.vs
+/src/Domain/obj
+/src/Application/obj
+/src/API/obj
+/src/Data/obj
+/src/obj
+/obj
+/src/Tests/obj
