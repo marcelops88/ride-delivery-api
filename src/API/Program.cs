@@ -1,3 +1,4 @@
+using API.Configurations.Extensions;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Interfaces;
 using Microsoft.OpenApi.Models;
@@ -38,7 +39,7 @@ namespace API
 
         private static void AddServices(WebApplicationBuilder builder)
         {
-
+            builder.Services.AddMongoServices(Configuration);
         }
 
         private static IConfiguration BuildConfiguration()

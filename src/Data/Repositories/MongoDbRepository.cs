@@ -4,7 +4,7 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 
-namespace Adapters.Mongo.Repositories
+namespace Data.Repositories
 {
     public class MongoDbRepository<TEntity> : IRepository<TEntity> where TEntity : EntityBase
     {
