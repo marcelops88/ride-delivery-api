@@ -1,7 +1,7 @@
 ﻿using API.Configurations.Attributes;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Application.API.v1.Controllers
+namespace API.Controllers.v1
 {
     /// <summary>
     /// Verificações de integridade da API v1
