@@ -23,7 +23,7 @@ namespace API.Configurations.Extensions
             }
 
             var mongoUrl = new MongoUrl(connectionString);
-            var databaseName = mongoUrl.DatabaseName ?? "rideanddeliverdb"; 
+            var databaseName = mongoUrl.DatabaseName ?? "rideanddeliverdb";
 
             var mongoClient = new MongoClient(connectionString);
             var database = mongoClient.GetDatabase(databaseName);
