@@ -41,9 +41,10 @@ namespace API.Controllers.v1
 
             var motoInput = _mapper.Map<MotoInput>(request);
 
-            await _motoService.CreateMotoAsync(motoInput);
+            var motoOutput = await _motoService.CreateMotoAsync(motoInput);
+            var motoResponse = _mapper.Map<MotoResponse>(motoOutput);
 
-            return CreatedAtAction(nameof(ConsultarMotoPorId), new { id = motoInput.Identificador }, motoInput);
+            return CreatedAtAction(nameof(CadastrarMoto), new { id = motoResponse.Identificador }, motoResponse);
         }
 
         /// <summary>
@@ -64,7 +65,9 @@ namespace API.Controllers.v1
                 return NotFound(new ErrorResponse { Message = "Nenhuma moto encontrada." });
             }
 
-            return Ok(motos);
+            var motosResponse = _mapper.Map<List<MotoResponse>>(motos);
+
+            return Ok(motosResponse);
         }
 
         /// <summary>
@@ -90,7 +93,7 @@ namespace API.Controllers.v1
 
             await _motoService.UpdateMotoPlateAsync(identificador, request.NovaPlaca);
 
-            return NoContent();
+            return Ok();
         }
 
         /// <summary>
@@ -111,8 +114,9 @@ namespace API.Controllers.v1
             {
                 return NotFound("Moto não encontrada.");
             }
+            var motoResponse = _mapper.Map<MotoResponse>(moto);
 
-            return Ok(moto);
+            return Ok(motoResponse);
         }
 
         /// <summary>
