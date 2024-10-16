@@ -95,7 +95,7 @@ namespace API
                 config.DocInclusionPredicate((docName, apiDesc) =>
                 {
                     var groupName = apiDesc.GroupName ?? string.Empty;
-                    return groupName == "HealthCheck" || groupName == "Motos" || groupName == "Entregadores";
+                    return groupName == "HealthCheck" || groupName == "Motos" || groupName == "Entregadores" || groupName== "Locacao";
                 });
 
                 config.TagActionsBy(api =>
@@ -110,7 +110,8 @@ namespace API
                         "HealthCheck" => "1-HealthCheck",
                         "Motos" => "2-Motos",
                         "Entregadores" => "3-Entregadores",
-                        _ => "4-Outros",
+                        "Locacao" => "4-Locacao",
+                        _ => "5-Outros",
                     };
                 });
             });

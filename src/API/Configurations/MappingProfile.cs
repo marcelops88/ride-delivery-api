@@ -38,6 +38,12 @@ namespace API.Configurations
                 .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
                 .ForMember(dest => dest.Active, opt => opt.MapFrom(src => true))
                 .ForMember(dest => dest.Version, opt => opt.MapFrom(src => 1));
+
+            CreateMap<LocacaoRequest, LocacaoInput>();
+
+            CreateMap<LocacaoOutput, LocacaoResponse>();
+
+            CreateMap<DevolucaoOutput, DevolucaoResponse>();
         }
     }
 }

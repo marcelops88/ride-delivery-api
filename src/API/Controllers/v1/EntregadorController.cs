@@ -48,7 +48,6 @@ namespace API.Controllers.v1
         /// <summary>
         /// Envia a imagem da CNH de um entregador para atualização de seu cadastro.
         /// O formato da imagem deve ser PNG ou BMP.
-        /// A imagem será armazenada localmente, e o caminho será salvo no cadastro do entregador.
         /// </summary>
         /// <param name="identificador">O identificador único do entregador.</param>
         /// <param name="UpdateImagemCNHRequest">Objeto que contém a imagem da CNH em formato Base64. O formato aceito é PNG ou BMP.</param>
