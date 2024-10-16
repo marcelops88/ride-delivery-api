@@ -27,9 +27,9 @@ namespace Domain.Services
             {
                 _logger.LogInformation("Tentando criar uma nova moto com identificador {Identificador} e placa {Placa}.", motoInput.Identificador, motoInput.Placa);
 
-                var existingMoto = await _motoRepository.FindByIdentificadorOrPlacaAsync(motoInput.Identificador, motoInput.Placa);
+                var resultado = await _motoRepository.FindByIdentificadorOrPlacaAsync(motoInput.Identificador, motoInput.Placa);
 
-                if (existingMoto != null)
+                if (resultado.Moto != null)
                 {
                     _logger.LogWarning("Já existe uma moto com esse identificador ou placa.");
                     throw new Exception("Já existe uma moto com esse identificador ou placa.");
@@ -53,8 +53,8 @@ namespace Domain.Services
             {
                 _logger.LogInformation("Tentando remover a moto com identificador {Identificador}.", identificador);
 
-                var moto = await _motoRepository.FindByIdentificadorOrPlacaAsync(null, identificador);
-                if (moto == null)
+                var resultado = await _motoRepository.FindByIdentificadorOrPlacaAsync(null, identificador);
+                if (resultado.Moto == null)
                 {
                     _logger.LogWarning("Moto não encontrada para remoção.");
                     throw new Exception("Moto não encontrada.");
@@ -62,7 +62,7 @@ namespace Domain.Services
 
                 // adicionar a lógica de verificação se a moto está ativa ou tem locações
 
-                _motoRepository.Delete(moto.Id);
+                _motoRepository.Delete(resultado.Moto.Id);
                 _logger.LogInformation("Moto removida com sucesso: {Identificador}.", identificador);
             }
             catch (Exception ex)
@@ -92,15 +92,15 @@ namespace Domain.Services
             try
             {
                 _logger.LogInformation("Consultando moto com identificador {Identificador}.", identificador);
-                var moto = await _motoRepository.FindByIdentificadorOrPlacaAsync(null, identificador);
+                var resultado = await _motoRepository.FindByIdentificadorOrPlacaAsync(null, identificador);
 
-                if (moto == null)
+                if (resultado.Moto == null)
                 {
                     _logger.LogWarning("Moto não encontrada: {Identificador}.", identificador);
                     throw new Exception("Moto não encontrada.");
                 }
 
-                return _mapper.Map<MotoOutput>(moto);
+                return _mapper.Map<MotoOutput>(resultado.Moto);
             }
             catch (Exception ex)
             {
@@ -114,23 +114,22 @@ namespace Domain.Services
             try
             {
                 _logger.LogInformation("Tentando atualizar a placa da moto com identificador {Identificador}.", identificador);
-                var moto = await _motoRepository.FindByIdentificadorOrPlacaAsync(null, identificador);
+                var resultado = await _motoRepository.FindByIdentificadorOrPlacaAsync(identificador, novaPlaca);
 
-                if (moto == null)
+                if (resultado.Moto == null)
                 {
                     _logger.LogWarning("Moto não encontrada ao tentar atualizar placa: {Identificador}.", identificador);
                     throw new Exception("Moto não encontrada.");
                 }
 
-                var existingMoto = await _motoRepository.FindByIdentificadorOrPlacaAsync(novaPlaca, null);
-                if (existingMoto != null && existingMoto.Identificador != identificador)
+                if (resultado.PlacaExistente && resultado.Moto.Placa != novaPlaca)
                 {
                     _logger.LogWarning("Já existe uma moto com essa placa: {Placa}.", novaPlaca);
                     throw new Exception("Já existe uma moto com essa placa.");
                 }
 
-                moto.Placa = novaPlaca;
-                _motoRepository.Update(moto);
+                resultado.Moto.Placa = novaPlaca;
+                _motoRepository.Update(resultado.Moto);
                 _logger.LogInformation("Placa da moto atualizada com sucesso: {Identificador}.", identificador);
             }
             catch (Exception ex)

@@ -1,10 +1,11 @@
 ﻿
 using Domain.Entities;
+using Domain.Models;
 
 namespace Domain.Interfaces.Repositories
 {
     public interface IMotoRepository : IRepository<Moto>
     {
-        Task<Moto> FindByIdentificadorOrPlacaAsync(string? identificador, string? placa);
+        Task<MotoPlaca> FindByIdentificadorOrPlacaAsync(string? identificador, string? placa);
     }
 }
