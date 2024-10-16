@@ -22,20 +22,20 @@ namespace Data.Repositories
 
                 if (motoByIdentificador != null)
                 {
-                    return motoByIdentificador; 
+                    return motoByIdentificador;
                 }
             }
-          
+
             if (!string.IsNullOrWhiteSpace(placa))
             {
                 var motoByPlaca = await _collection
                     .Find(m => m.Placa == placa)
                     .FirstOrDefaultAsync();
 
-                return motoByPlaca; 
+                return motoByPlaca;
             }
 
-            return null; 
+            return null;
         }
     }
 }

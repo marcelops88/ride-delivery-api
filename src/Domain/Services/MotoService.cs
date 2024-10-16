@@ -12,13 +12,13 @@ namespace Domain.Services
     {
         private readonly IMotoRepository _motoRepository;
         private readonly IMapper _mapper;
-        private readonly ILogger<MotoService> _logger; 
+        private readonly ILogger<MotoService> _logger;
 
         public MotoService(IMotoRepository motoRepository, IMapper mapper, ILogger<MotoService> logger)
         {
             _motoRepository = motoRepository;
             _mapper = mapper;
-            _logger = logger; 
+            _logger = logger;
         }
 
         public async Task<MotoOutput> CreateMotoAsync(MotoInput motoInput)
