@@ -1,7 +1,8 @@
 ﻿using API.Configurations.Attributes;
 using API.DTOs.Requests;
-using Domain.Entities;
-using Domain.Interfaces.Repositories;
+using AutoMapper;
+using Domain.Interfaces.Services;
+using Domain.Models.Inputs;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
 
@@ -12,11 +13,13 @@ namespace API.Controllers.v1
     [Produces("application/json")]
     public class MotoController : ControllerBase
     {
-        private readonly IRepository<Moto> _motoRepository;
+        private readonly IMotoService _motoService;
+        private readonly IMapper _mapper;
 
-        public MotoController(IRepository<Moto> motoRepository)
+        public MotoController(IMotoService motoService, IMapper mapper)
         {
-            _motoRepository = motoRepository;
+            _motoService = motoService;
+            _mapper = mapper;
         }
 
         /// <summary>
@@ -25,21 +28,13 @@ namespace API.Controllers.v1
         /// <param name="request">Os dados da moto a serem cadastrados.</param>
         /// <returns>Um status de sucesso ou erro.</returns>
         [HttpPost]
-        public IActionResult CadastrarMoto([FromBody] MotoRequest request)
+        public async Task<IActionResult> CadastrarMoto([FromBody] MotoRequest request)
         {
-            var moto = new Moto
-            {
-                Identificador = request.Identificador,
-                Ano = request.Ano.ToString(),
-                Modelo = request.Modelo,
-                Placa = request.Placa
-            };
+            var motoInput = _mapper.Map<MotoInput>(request);
 
-            _motoRepository.Add(moto);
+            await _motoService.CreateMotoAsync(motoInput);
 
-            // Publicar evento de moto cadastrada (mensageria aqui)
-
-            return CreatedAtAction(nameof(ConsultarMotoPorId), new { id = moto.Id }, moto);
+            return CreatedAtAction(nameof(ConsultarMotoPorId), new { id = motoInput.Identificador }, motoInput);
         }
 
         /// <summary>
@@ -47,9 +42,9 @@ namespace API.Controllers.v1
         /// </summary>
         /// <returns>Lista de motos cadastradas.</returns>
         [HttpGet]
-        public IActionResult ConsultarMotos()
+        public async Task<IActionResult> ConsultarMotos()
         {
-            var motos = _motoRepository.GetAll().ToList();
+            var motos = await _motoService.GetAllMotosAsync();
             return Ok(motos);
         }
 
@@ -60,17 +55,16 @@ namespace API.Controllers.v1
         /// <param name="request">Um objeto contendo a nova placa da moto.</param>
         /// <returns>Status de sucesso ou erro.</returns>
         [HttpPut("{id}/placa")]
-        public IActionResult ModificarPlacaMoto([FromRoute] ObjectId id, [FromBody] ModificarPlacaRequest request)
+        public async Task<IActionResult> ModificarPlacaMoto([FromRoute] ObjectId id, [FromBody] ModificarPlacaRequest request)
         {
-            var moto = _motoRepository.GetById(id);
+            var moto = await _motoService.GetMotoByIdAsync(id);
 
             if (moto == null)
             {
                 return NotFound("Moto não encontrada.");
             }
 
-            moto.Placa = request.NovaPlaca;
-            _motoRepository.Update(moto);
+            await _motoService.UpdateMotoPlateAsync(id, request.NovaPlaca);
 
             return NoContent();
         }
@@ -81,9 +75,9 @@ namespace API.Controllers.v1
         /// <param name="id">ID da moto a ser consultada.</param>
         /// <returns>Dados da moto consultada.</returns>
         [HttpGet("{id}")]
-        public IActionResult ConsultarMotoPorId(ObjectId id)
+        public async Task<IActionResult> ConsultarMotoPorId(ObjectId id)
         {
-            var moto = _motoRepository.GetById(id);
+            var moto = await _motoService.GetMotoByIdAsync(id);
 
             if (moto == null)
             {
@@ -95,20 +89,20 @@ namespace API.Controllers.v1
 
         /// <summary>
         /// Remover uma moto.
-        ///// </summary>
+        /// </summary>
         /// <param name="id">ID da moto a ser removida.</param>
         /// <returns>Status de sucesso ou erro.</returns>
         [HttpDelete("{id}")]
-        public IActionResult RemoverMoto(ObjectId id)
+        public async Task<IActionResult> RemoverMoto(ObjectId id)
         {
-            var moto = _motoRepository.GetById(id);
+            var moto = await _motoService.GetMotoByIdAsync(id);
 
             if (moto == null)
             {
                 return NotFound("Moto não encontrada.");
             }
 
-            _motoRepository.Delete(id);
+            await _motoService.DeleteMotoAsync(id);
             return NoContent();
         }
     }
