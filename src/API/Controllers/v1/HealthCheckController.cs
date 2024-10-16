@@ -9,6 +9,7 @@ namespace API.Controllers.v1
     [ApiController]
     [ApiV1Route("[controller]")]
     [Produces("application/json")]
+    [ApiExplorerSettings(GroupName = "HealthCheck")]
     public class HealthCheckController : ControllerBase
     {
         /// <summary>

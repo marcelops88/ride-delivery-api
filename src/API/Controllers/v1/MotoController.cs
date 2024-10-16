@@ -11,6 +11,7 @@ namespace API.Controllers.v1
     [ApiController]
     [ApiV1Route("[controller]")]
     [Produces("application/json")]
+    [ApiExplorerSettings(GroupName = "Motos")]
     public class MotoController : ControllerBase
     {
         private readonly IMotoService _motoService;

@@ -87,6 +87,27 @@ namespace API
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 config.IncludeXmlComments(xmlPath);
+                config.DocInclusionPredicate((docName, apiDesc) =>
+                {
+                    var groupName = apiDesc.GroupName ?? string.Empty;
+                    return groupName == "HealthCheck" || groupName == "Motos" || groupName == "Entregadores";
+                });
+
+                config.TagActionsBy(api =>
+                {
+                    return new List<string> { api.GroupName ?? "Outros" };
+                });
+
+                config.OrderActionsBy(apiDesc =>
+                {
+                    return apiDesc.GroupName switch
+                    {
+                        "HealthCheck" => "1-HealthCheck",
+                        "Motos" => "2-Motos",
+                        "Entregadores" => "3-Entregadores",
+                        _ => "4-Outros",
+                    };
+                });
             });
         }
 
