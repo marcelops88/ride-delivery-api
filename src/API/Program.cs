@@ -1,4 +1,7 @@
 using API.Configurations.Extensions;
+using Domain.Interfaces.Services;
+using Domain.Models;
+using Domain.Services;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Interfaces;
 using Microsoft.OpenApi.Models;
@@ -40,6 +43,8 @@ namespace API
         private static void AddServices(WebApplicationBuilder builder)
         {
             builder.Services.AddMongoServices(Configuration);
+            builder.Services.Configure<StorageSettings>(Configuration.GetSection("StorageSettings"));
+            builder.Services.AddScoped<IImagemService, ImagemService>();
         }
 
         private static IConfiguration BuildConfiguration()

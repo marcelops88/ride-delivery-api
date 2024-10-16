@@ -11,12 +11,14 @@ public class EntregadorService : IEntregadorService
     private readonly IEntregadorRepository _entregadorRepository;
     private readonly IMapper _mapper;
     private readonly ILogger<EntregadorService> _logger;
+    private readonly IImagemService _imageService;
 
-    public EntregadorService(IEntregadorRepository entregadorRepository, IMapper mapper, ILogger<EntregadorService> logger)
+    public EntregadorService(IEntregadorRepository entregadorRepository, IMapper mapper, ILogger<EntregadorService> logger, IImagemService imageService)
     {
         _entregadorRepository = entregadorRepository;
         _mapper = mapper;
         _logger = logger;
+        _imageService = imageService;
     }
 
     public async Task<EntregadorOutput> CreateEntregadorAsync(EntregadorInput entregadorInput)
@@ -48,9 +50,33 @@ public class EntregadorService : IEntregadorService
         _logger.LogInformation("Cadastro do entregador {Identificador} concluído com sucesso.", entregadorOutput.Identificador);
         return entregadorOutput;
     }
-
-    public Task UpdateImagemCNHAsync(string identificador, string Base64ImagemCNH)
+    public async Task UpdateImagemCNHAsync(string identificador, string base64ImagemCNH)
     {
-        throw new NotImplementedException();
+        _logger.LogInformation("Atualizando imagem da CNH para o entregador: {Identificador}", identificador);
+
+        var entregador = await ValidarEntregadorExistente(identificador);
+
+        string caminhoImagem = await _imageService.SalvarImagemCNHAsync(identificador, base64ImagemCNH);
+
+        AtualizarCaminhoImagemCNH(entregador, caminhoImagem);
+
+        _logger.LogInformation("Caminho da imagem da CNH atualizado para o entregador: {Identificador}", identificador);
+    }
+
+    private async Task<Entregador> ValidarEntregadorExistente(string identificador)
+    {
+        var entregador = await _entregadorRepository.FindByIdentificadorAsync(identificador);
+        if (entregador == null)
+        {
+            _logger.LogWarning("Entregador não encontrado para o identificador: {Identificador}", identificador);
+            throw new Exception("Entregador não encontrado.");
+        }
+        return entregador;
+    }
+    private void AtualizarCaminhoImagemCNH(Entregador entregador, string caminhoCompleto)
+    {
+        entregador.ImagemCNH = caminhoCompleto;
+        _entregadorRepository.Update(entregador);
     }
 }
+
