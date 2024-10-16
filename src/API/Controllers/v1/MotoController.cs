@@ -5,7 +5,6 @@ using AutoMapper;
 using Domain.Interfaces.Services;
 using Domain.Models.Inputs;
 using Microsoft.AspNetCore.Mvc;
-using MongoDB.Bson;
 
 namespace API.Controllers.v1
 {
@@ -54,11 +53,11 @@ namespace API.Controllers.v1
         /// <response code="200">Retorna a lista de motos cadastradas.</response>
         /// <response code="404">Se nenhuma moto for encontrada.</response>
         [HttpGet]
-        [ProducesResponseType(typeof(List<MotoResponse>), StatusCodes.Status200OK)] 
-        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)] 
-        public async Task<IActionResult> ConsultarMotos()
+        [ProducesResponseType(typeof(List<MotoResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
+        public IActionResult ConsultarMotos()
         {
-            var motos = await _motoService.GetAllMotosAsync();
+            var motos = _motoService.GetAllMotos();
 
             if (motos == null || !motos.Any())
             {
@@ -68,11 +67,10 @@ namespace API.Controllers.v1
             return Ok(motos);
         }
 
-
         /// <summary>
         /// Modificar a placa de uma moto.
         /// </summary>
-        /// <param name="id">ID da moto a ser modificada.</param>
+        /// <param name="identificador">Identificador da moto a ser modificada.</param>
         /// <param name="request">Um objeto contendo a nova placa da moto.</param>
         /// <returns>Status de sucesso ou erro.</returns>
         /// <response code="200">Placa da moto modificada com sucesso.</response>
@@ -80,34 +78,34 @@ namespace API.Controllers.v1
         [HttpPut("{id}/placa")]
         [ProducesResponseType(typeof(List<PlacaResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> ModificarPlacaMoto([FromRoute] ObjectId id, [FromBody] ModificarPlacaRequest request)
+        public async Task<IActionResult> ModificarPlacaMoto([FromRoute] string identificador, [FromBody] ModificarPlacaRequest request)
         {
-            var moto = await _motoService.GetMotoByIdAsync(id);
+            if (!ModelState.IsValid)
+                return BadRequest(new ErrorResponse { Message = "Dados inválidos" });
+
+            var moto = await _motoService.GetMotoByIdAsync(identificador);
 
             if (moto == null)
-            {
                 return NotFound("Moto não encontrada.");
-            }
 
-            await _motoService.UpdateMotoPlateAsync(id, request.NovaPlaca);
+            await _motoService.UpdateMotoPlateAsync(identificador, request.NovaPlaca);
 
             return NoContent();
         }
 
-
         /// <summary>
-        /// Consultar uma moto existente por ID.
+        /// Consultar uma moto existente pelo Identificador.
         /// </summary>
-        /// <param name="id">ID da moto a ser consultada.</param>
+        /// <param name="identificador">Identificador da moto a ser consultada.</param>
         /// <returns>Dados da moto consultada.</returns>
         /// <response code="200">Dados da moto encontrada.</response>
         /// <response code="404">Moto não encontrada.</response>
         [HttpGet("{id}")]
         [ProducesResponseType(typeof(MotoResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> ConsultarMotoPorId(ObjectId id)
+        public async Task<IActionResult> ConsultarMotoPorId(string identificador)
         {
-            var moto = await _motoService.GetMotoByIdAsync(id);
+            var moto = await _motoService.GetMotoByIdAsync(identificador);
 
             if (moto == null)
             {
@@ -116,26 +114,27 @@ namespace API.Controllers.v1
 
             return Ok(moto);
         }
+
         /// <summary>
         /// Remover uma moto.
         /// </summary>
-        /// <param name="id">ID da moto a ser removida.</param>
+        /// <param name="identificador">Identificador da moto a ser removida.</param>
         /// <returns>Status de sucesso ou erro.</returns>
         /// <response code="204">Moto removida com sucesso.</response>
         /// <response code="404">Moto não encontrada.</response>
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> RemoverMoto(ObjectId id)
+        public async Task<IActionResult> RemoverMoto(string identificador)
         {
-            var moto = await _motoService.GetMotoByIdAsync(id);
+            var moto = await _motoService.GetMotoByIdAsync(identificador);
 
             if (moto == null)
             {
                 return NotFound("Moto não encontrada.");
             }
 
-            await _motoService.DeleteMotoAsync(id);
+            await _motoService.DeleteMotoAsync(identificador);
             return NoContent();
         }
 

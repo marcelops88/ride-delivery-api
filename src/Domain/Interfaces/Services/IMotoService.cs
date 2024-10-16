@@ -1,19 +1,18 @@
-﻿using Domain.Entities;
-using Domain.Models.Inputs;
-using MongoDB.Bson;
+﻿using Domain.Models.Inputs;
+using Domain.Models.Outputs;
 
 namespace Domain.Interfaces.Services
 {
     public interface IMotoService
     {
-        Task<Moto> CreateMotoAsync(MotoInput moto);
+        Task<MotoOutput> CreateMotoAsync(MotoInput moto);
 
-        Task<IEnumerable<Moto>> GetAllMotosAsync();
+        IEnumerable<MotoOutput> GetAllMotos();
 
-        Task<Moto> GetMotoByIdAsync(ObjectId id);
+        Task<MotoOutput> GetMotoByIdAsync(string identificador);
 
-        Task UpdateMotoPlateAsync(ObjectId id, string novaPlaca);
+        Task UpdateMotoPlateAsync(string identificador, string novaPlaca);
 
-        Task DeleteMotoAsync(ObjectId id);
+        Task DeleteMotoAsync(string identificador);
     }
 }
