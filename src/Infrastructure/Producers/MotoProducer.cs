@@ -1,12 +1,12 @@
-﻿using Domain.Entities;
-using Domain.Interfaces.Messaging;
+﻿using Domain.Interfaces.Messaging;
+using Domain.Models.Inputs;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
 using System.Text;
 
 namespace Infrastructure.Messaging.Producers
 {
-    public class MotoProducer : IProducer<Moto>
+    public class MotoProducer : IProducer<MotoInput>
     {
         private readonly IConnection _connection;
         private readonly IModel _channel;
@@ -17,7 +17,7 @@ namespace Infrastructure.Messaging.Producers
             _channel = _connection.CreateModel();
         }
 
-        public void Publish(Moto moto)
+        public void Publish(MotoInput moto)
         {
             _channel.QueueDeclare(queue: "moto_cadastro",
                                  durable: false,

@@ -79,8 +79,8 @@ namespace API.Controllers.v1
         /// <returns>Status de sucesso ou erro.</returns>
         /// <response code="200">Placa da moto modificada com sucesso.</response>
         /// <response code="404">Moto não encontrada.</response>
-        [HttpPut("{id}/placa")]
-        [ProducesResponseType(typeof(List<PlacaResponse>), StatusCodes.Status200OK)]
+        [HttpPut("{identificador}/placa")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> ModificarPlacaMoto([FromRoute] string identificador, [FromBody] ModificarPlacaRequest request)
         {
@@ -104,7 +104,7 @@ namespace API.Controllers.v1
         /// <returns>Dados da moto consultada.</returns>
         /// <response code="200">Dados da moto encontrada.</response>
         /// <response code="404">Moto não encontrada.</response>
-        [HttpGet("{id}")]
+        [HttpGet("{identificador}")]
         [ProducesResponseType(typeof(MotoResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> ConsultarMotoPorId(string identificador)
@@ -127,7 +127,7 @@ namespace API.Controllers.v1
         /// <returns>Status de sucesso ou erro.</returns>
         /// <response code="204">Moto removida com sucesso.</response>
         /// <response code="404">Moto não encontrada.</response>
-        [HttpDelete("{id}")]
+        [HttpDelete("{identificador}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> RemoverMoto(string identificador)

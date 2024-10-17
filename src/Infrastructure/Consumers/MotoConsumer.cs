@@ -1,6 +1,8 @@
-﻿using Domain.Entities;
+﻿using AutoMapper;
+using Domain.Entities;
 using Domain.Interfaces.Messaging;
 using Domain.Interfaces.Repositories;
+using Domain.Models.Inputs;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
@@ -16,13 +18,16 @@ namespace Infrastructure.Messaging.Consumers
         private readonly IModel _channel;
         private readonly IServiceScopeFactory _serviceScopeFactory;
         private readonly INotificationService _notificationService;
+        private readonly IMapper _mapper;
 
-        public MotoConsumer(IConnection connection, INotificationService notificationService, IServiceScopeFactory serviceScopeFactory)
+
+        public MotoConsumer(IConnection connection, INotificationService notificationService, IServiceScopeFactory serviceScopeFactory, IMapper mapper)
         {
             _connection = connection;
             _channel = _connection.CreateModel();
             _notificationService = notificationService;
             _serviceScopeFactory = serviceScopeFactory;
+            _mapper = mapper;
         }
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
@@ -38,7 +43,7 @@ namespace Infrastructure.Messaging.Consumers
             {
                 var body = ea.Body.ToArray();
                 var message = Encoding.UTF8.GetString(body);
-                var moto = JsonConvert.DeserializeObject<Moto>(message);
+                var moto = JsonConvert.DeserializeObject<MotoInput>(message);
                 await ProcessarMotoAsync(moto);
             };
 
@@ -49,16 +54,18 @@ namespace Infrastructure.Messaging.Consumers
             return Task.CompletedTask;
         }
 
-        private async Task ProcessarMotoAsync(Moto moto)
+        private async Task ProcessarMotoAsync(MotoInput moto)
         {
             using (var scope = _serviceScopeFactory.CreateScope())
             {
                 var motoRepository = scope.ServiceProvider.GetRequiredService<IMotoRepository>();
                 var notificationService = scope.ServiceProvider.GetRequiredService<INotificationService>();
 
-                motoRepository.Add(moto);
+                var motoAdd = _mapper.Map<Moto>(moto);
 
-                if (moto.Ano == "2024")
+                motoRepository.Add(motoAdd);
+
+                if (moto.Ano == 2024)
                 {
                     await _notificationService.NotifyAsync($"Moto do ano 2024 cadastrada: {moto.Identificador}");
                 }

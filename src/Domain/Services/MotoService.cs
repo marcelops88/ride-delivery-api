@@ -15,9 +15,9 @@ namespace Domain.Services
         private readonly ILocacaoRepository _locacaoRepository;
         private readonly IMapper _mapper;
         private readonly ILogger<MotoService> _logger;
-        private readonly IProducer<Moto> _motoProducer;
+        private readonly IProducer<MotoInput> _motoProducer;
 
-        public MotoService(IMotoRepository motoRepository, IMapper mapper, ILogger<MotoService> logger, IProducer<Moto> motoProducer, ILocacaoRepository locacaoRepository)
+        public MotoService(IMotoRepository motoRepository, IMapper mapper, ILogger<MotoService> logger, IProducer<MotoInput> motoProducer, ILocacaoRepository locacaoRepository)
         {
             _motoRepository = motoRepository;
             _mapper = mapper;
@@ -34,15 +34,15 @@ namespace Domain.Services
 
                 var resultado = await _motoRepository.FindByIdentificadorOrPlacaAsync(motoInput.Identificador, motoInput.Placa);
 
-                if (resultado.Moto != null)
+                if (resultado.Moto != null && resultado.Moto.Active)
                 {
-                    _logger.LogWarning("Já existe uma moto com esse identificador ou placa.");
-                    throw new Exception("Já existe uma moto com esse identificador ou placa.");
+                    _logger.LogWarning("Já existe uma moto ativa com esse identificador ou placa.");
+                    throw new Exception("Já existe uma moto ativa com esse identificador ou placa.");
                 }
 
                 var moto = _mapper.Map<Moto>(motoInput);
 
-                _motoProducer.Publish(moto);
+                _motoProducer.Publish(motoInput);
 
                 _logger.LogInformation("Moto publicada com sucesso: {Identificador}.", moto.Identificador);
                 return _mapper.Map<MotoOutput>(moto);
@@ -60,17 +60,17 @@ namespace Domain.Services
             {
                 _logger.LogInformation("Tentando remover a moto com identificador {Identificador}.", identificador);
 
-                var resultado = await _motoRepository.FindByIdentificadorOrPlacaAsync(null, identificador);
+                var resultado = await _motoRepository.FindByIdentificadorOrPlacaAsync(identificador, null);
                 if (resultado.Moto == null)
                 {
                     _logger.LogWarning("Moto não encontrada para remoção.");
                     throw new Exception("Moto não encontrada.");
                 }
 
-                if (resultado.Moto.Active || await TemLocacoesAtivasAsync(resultado.Moto.Identificador))
+                if (await TemLocacoesAtivasAsync(resultado.Moto.Identificador))
                 {
-                    _logger.LogWarning("Não é possível remover a moto. A moto está ativa ou possui locações.");
-                    throw new Exception("Não é possível remover a moto. A moto está ativa ou possui locações.");
+                    _logger.LogWarning("Não é possível remover a moto. A moto possui locações.");
+                    throw new Exception("Não é possível remover a moto. A moto possui locações.");
                 }
 
                 _motoRepository.Delete(resultado.Moto.Id);
@@ -108,7 +108,7 @@ namespace Domain.Services
             try
             {
                 _logger.LogInformation("Consultando moto com identificador {Identificador}.", identificador);
-                var resultado = await _motoRepository.FindByIdentificadorOrPlacaAsync(null, identificador);
+                var resultado = await _motoRepository.FindByIdentificadorOrPlacaAsync(identificador, null);
 
                 if (resultado.Moto == null)
                 {
@@ -136,6 +136,12 @@ namespace Domain.Services
                 {
                     _logger.LogWarning("Moto não encontrada ao tentar atualizar placa: {Identificador}.", identificador);
                     throw new Exception("Moto não encontrada.");
+                }
+
+                if (!resultado.Moto.Active)
+                {
+                    _logger.LogWarning("A moto com identificador {Identificador} não está ativa. Não é possível atualizar a placa.", identificador);
+                    throw new Exception("Não é possível atualizar a placa de uma moto inativa.");
                 }
 
                 if (resultado.PlacaExistente && resultado.Moto.Placa != novaPlaca)

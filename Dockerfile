@@ -2,13 +2,16 @@
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /app
 
-# Copia os arquivos do projeto e restaura as dependências
-COPY *.csproj ./
-RUN dotnet restore
+# Copia o arquivo .csproj e restaura as dependências
+COPY src/API/*.csproj ./src/API/
+RUN dotnet restore ./src/API
 
-# Copia todo o restante e faz o build da aplicação
-COPY . ./
-RUN dotnet publish -c Release -o out
+# Copia o restante dos arquivos do projeto
+COPY ./src ./src
+
+# Faz o build da aplicação
+WORKDIR /app/src/API
+RUN dotnet publish -c Release -o /app/out
 
 # Etapa 2: Imagem para execução
 FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS runtime

@@ -7,6 +7,8 @@ services:
       - "27017:27017"
     volumes:
       - mongo_data:/data/db
+    networks:
+      - rideanddeliver-network
 
   rabbitmq:
     image: rabbitmq:management
@@ -16,8 +18,10 @@ services:
     environment:
       RABBITMQ_DEFAULT_USER: rideanddeliver
       RABBITMQ_DEFAULT_PASS: rideanddeliver01
+    networks:
+      - rideanddeliver-network
 
-  vendas-api:
+  ride-delivery-api:
     build: .
     ports:
       - "5000:5000"
@@ -30,9 +34,11 @@ services:
       RabbitMQ__Host: "rabbitmq" # Host do RabbitMQ
       RabbitMQ__Username: "rideanddeliver"  # Usuário do RabbitMQ
       RabbitMQ__Password: "rideanddeliver01"  # Senha do RabbitMQ
-    links:
-      - mongo
-      - rabbitmq
+    networks:
+      - rideanddeliver-network
 
 volumes:
   mongo_data:
+
+networks:
+  rideanddeliver-network:

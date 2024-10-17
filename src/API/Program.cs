@@ -1,10 +1,10 @@
 using API.Configurations;
 using API.Configurations.Extensions;
 using Data.Repositories;
-using Domain.Entities;
 using Domain.Interfaces.Messaging;
 using Domain.Interfaces.Repositories;
 using Domain.Interfaces.Services;
+using Domain.Models.Inputs;
 using Domain.Models.Settings;
 using Domain.Services;
 using Infrastructure.Messaging.Consumers;
@@ -69,7 +69,7 @@ namespace API
 
 
             builder.Services.Configure<WebhookSettings>(Configuration.GetSection("WebhookSettings"));
-            builder.Services.AddSingleton<IProducer<Moto>, MotoProducer>();
+            builder.Services.AddSingleton<IProducer<MotoInput>, MotoProducer>();
             builder.Services.AddSingleton<IHostedService, MotoConsumer>();
 
             // Configurando o AutoMapper
