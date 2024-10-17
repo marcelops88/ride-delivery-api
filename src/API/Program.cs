@@ -1,4 +1,7 @@
+using API.Configurations;
 using API.Configurations.Extensions;
+using Data.Repositories;
+using Domain.Interfaces.Repositories;
 using Domain.Interfaces.Services;
 using Domain.Models;
 using Domain.Services;
@@ -44,7 +47,20 @@ namespace API
         {
             builder.Services.AddMongoServices(Configuration);
             builder.Services.Configure<StorageSettings>(Configuration.GetSection("StorageSettings"));
+            // Registrando os serviços
+            builder.Services.AddScoped<ILocacaoService, LocacaoService>();
+            builder.Services.AddScoped<IDevolucaoService, DevolucaoService>();
+            builder.Services.AddScoped<IEntregadorService, EntregadorService>();
+            builder.Services.AddScoped<IMotoService, MotoService>();
             builder.Services.AddScoped<IImagemService, ImagemService>();
+
+            // Registrando os repositórios
+            builder.Services.AddScoped<ILocacaoRepository, LocacaoRepository>();
+            builder.Services.AddScoped<IEntregadorRepository, EntregadorRepository>();
+            builder.Services.AddScoped<IMotoRepository, MotoRepository>();
+
+            // Configurando o AutoMapper
+            builder.Services.AddAutoMapper(typeof(MappingProfile));
         }
 
         private static IConfiguration BuildConfiguration()
@@ -95,7 +111,7 @@ namespace API
                 config.DocInclusionPredicate((docName, apiDesc) =>
                 {
                     var groupName = apiDesc.GroupName ?? string.Empty;
-                    return groupName == "HealthCheck" || groupName == "Motos" || groupName == "Entregadores" || groupName== "Locacao";
+                    return groupName == "HealthCheck" || groupName == "Motos" || groupName == "Entregadores" || groupName == "Locacao";
                 });
 
                 config.TagActionsBy(api =>

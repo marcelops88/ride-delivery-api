@@ -5,13 +5,13 @@ namespace Domain.Entities
     public class Locacao : EntityBase
     {
         [BsonElement("entregador_id")]
-        public string EntregadorId { get; set; }
+        public string IdentificadorEntregador { get; set; }
 
         [BsonElement("moto_id")]
-        public string MotoId { get; set; }
+        public string IdentificadorMoto { get; set; }
 
         [BsonElement("data_inicio")]
-        public DateTime DataInicio { get; set; }
+        public DateTime DataInicio { get; set; } = DateTime.Now.AddDays(1);
 
         [BsonElement("data_termino")]
         public DateTime? DataTermino { get; set; }
@@ -21,6 +21,9 @@ namespace Domain.Entities
 
         [BsonElement("plano")]
         public int Plano { get; set; }
+
+        [BsonElement("valor_total")]
+        public decimal ValorTotal { get; set; }
     }
 
 }

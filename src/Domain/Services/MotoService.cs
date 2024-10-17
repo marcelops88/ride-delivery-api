@@ -8,7 +8,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Domain.Services
 {
-    internal class MotoService : IMotoService
+    public class MotoService : IMotoService
     {
         private readonly IMotoRepository _motoRepository;
         private readonly IMapper _mapper;

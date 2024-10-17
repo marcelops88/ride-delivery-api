@@ -6,6 +6,6 @@ namespace Domain.Interfaces.Services
     public interface ILocacaoService
     {
         Task<LocacaoOutput> CreateLocacaoAsync(LocacaoInput locacaoInput);
-        Task<LocacaoOutput> FindByIdAsync(object id);
+        Task<LocacaoOutput> FindByIdAsync(string identificadorLocacao);
     }
 }

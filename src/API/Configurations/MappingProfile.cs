@@ -44,6 +44,15 @@ namespace API.Configurations
             CreateMap<LocacaoOutput, LocacaoResponse>();
 
             CreateMap<DevolucaoOutput, DevolucaoResponse>();
+
+            CreateMap<LocacaoInput, Locacao>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.ValorTotal, opt => opt.Ignore())
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => DateTime.UtcNow))
+                .ForMember(dest => dest.UpdatedAt, opt => opt.Ignore())
+                .ForMember(dest => dest.Active, opt => opt.MapFrom(src => true))
+                .ForMember(dest => dest.Version, opt => opt.MapFrom(src => 1));
+
         }
     }
 }

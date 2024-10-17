@@ -49,7 +49,7 @@ public class LocacaoController : ControllerBase
     /// <summary>
     /// Retorna os detalhes de uma locação pelo identificador.
     /// </summary>
-    /// <param name="identificador">O identificador da locação (obrigatório).</param>
+    /// <param name="identificadorLocacao">O identificador da locação (obrigatório).</param>
     /// <returns>Um objeto LocacaoResponse contendo os detalhes da locação.</returns>
     /// <response code="200">Retorna os detalhes da locação.</response>
     /// <response code="400">Identificador da locação inválido ou ausente.</response>
@@ -58,14 +58,14 @@ public class LocacaoController : ControllerBase
     [ProducesResponseType(typeof(LocacaoResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetLocacaoById([FromRoute][Required] string identificador)
+    public async Task<IActionResult> GetLocacaoById([FromRoute][Required] string identificadorLocacao)
     {
-        if (string.IsNullOrEmpty(identificador))
+        if (string.IsNullOrEmpty(identificadorLocacao))
         {
             return BadRequest(new ErrorResponse { Message = "O identificador da locação é obrigatório." });
         }
 
-        var locacao = await _locacaoService.FindByIdAsync(identificador);
+        var locacao = await _locacaoService.FindByIdAsync(identificadorLocacao);
         if (locacao == null)
         {
             return NotFound(new ErrorResponse { Message = "Locação não encontrada." });
