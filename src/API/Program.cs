@@ -1,12 +1,14 @@
 using API.Configurations;
 using API.Configurations.Extensions;
 using Data.Repositories;
+using Domain.Entities;
 using Domain.Interfaces.Messaging;
 using Domain.Interfaces.Repositories;
 using Domain.Interfaces.Services;
 using Domain.Models.Settings;
 using Domain.Services;
 using Infrastructure.Messaging.Consumers;
+using Infrastructure.Messaging.Producers;
 using Infrastructure.Service;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Any;
@@ -66,13 +68,19 @@ namespace API
             builder.Services.AddScoped<IMotoRepository, MotoRepository>();
 
 
-            builder.Services.AddScoped<INotificationService, NotificationService>();
             builder.Services.Configure<WebhookSettings>(Configuration.GetSection("WebhookSettings"));
-
-            builder.Services.AddHostedService<MotoConsumer>();
+            builder.Services.AddSingleton<IProducer<Moto>, MotoProducer>();
+            builder.Services.AddSingleton<IHostedService, MotoConsumer>();
 
             // Configurando o AutoMapper
             builder.Services.AddAutoMapper(typeof(MappingProfile));
+
+            // Registrar NotificationService com HttpClient
+            builder.Services.AddHttpClient<INotificationService, NotificationService>();
+
+            // Registrar WebhookSettings
+            builder.Services.Configure<WebhookSettings>(builder.Configuration.GetSection("WebhookSettings"));
+
         }
 
         private static IConfiguration BuildConfiguration()

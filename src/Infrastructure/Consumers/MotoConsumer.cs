@@ -1,6 +1,7 @@
 ﻿using Domain.Entities;
 using Domain.Interfaces.Messaging;
 using Domain.Interfaces.Repositories;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using RabbitMQ.Client;
@@ -13,15 +14,15 @@ namespace Infrastructure.Messaging.Consumers
     {
         private readonly IConnection _connection;
         private readonly IModel _channel;
-        private readonly IMotoRepository _motoRepository;
+        private readonly IServiceScopeFactory _serviceScopeFactory;
         private readonly INotificationService _notificationService;
 
-        public MotoConsumer(IConnection connection, IMotoRepository motoRepository, INotificationService notificationService)
+        public MotoConsumer(IConnection connection, INotificationService notificationService, IServiceScopeFactory serviceScopeFactory)
         {
             _connection = connection;
-            _motoRepository = motoRepository;
             _channel = _connection.CreateModel();
             _notificationService = notificationService;
+            _serviceScopeFactory = serviceScopeFactory;
         }
 
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
@@ -50,11 +51,17 @@ namespace Infrastructure.Messaging.Consumers
 
         private async Task ProcessarMotoAsync(Moto moto)
         {
-            _motoRepository.Add(moto);
-
-            if (moto.Ano == "2024")
+            using (var scope = _serviceScopeFactory.CreateScope())
             {
-                await _notificationService.NotifyAsync($"Moto do ano 2024 cadastrada: {moto.Identificador}");
+                var motoRepository = scope.ServiceProvider.GetRequiredService<IMotoRepository>();
+                var notificationService = scope.ServiceProvider.GetRequiredService<INotificationService>();
+
+                motoRepository.Add(moto);
+
+                if (moto.Ano == "2024")
+                {
+                    await _notificationService.NotifyAsync($"Moto do ano 2024 cadastrada: {moto.Identificador}");
+                }
             }
         }
 
