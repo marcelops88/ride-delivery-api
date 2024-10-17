@@ -1,5 +1,5 @@
 ﻿using Domain.Interfaces.Services;
-using Domain.Models;
+using Domain.Models.Settings;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 

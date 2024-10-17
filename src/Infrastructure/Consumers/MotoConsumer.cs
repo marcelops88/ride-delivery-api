@@ -33,12 +33,12 @@ namespace Infrastructure.Messaging.Consumers
                                   arguments: null);
 
             var consumer = new EventingBasicConsumer(_channel);
-            consumer.Received += (model, ea) =>
+            consumer.Received += async (model, ea) =>
             {
                 var body = ea.Body.ToArray();
                 var message = Encoding.UTF8.GetString(body);
                 var moto = JsonConvert.DeserializeObject<Moto>(message);
-                ProcessarMoto(moto);
+                await ProcessarMotoAsync(moto);
             };
 
             _channel.BasicConsume(queue: "moto_cadastro",
@@ -48,13 +48,13 @@ namespace Infrastructure.Messaging.Consumers
             return Task.CompletedTask;
         }
 
-        private void ProcessarMoto(Moto moto)
+        private async Task ProcessarMotoAsync(Moto moto)
         {
             _motoRepository.Add(moto);
 
             if (moto.Ano == "2024")
             {
-                _notificationService.Notify($"Moto do ano 2024 cadastrada: {moto.Identificador}");
+                await _notificationService.NotifyAsync($"Moto do ano 2024 cadastrada: {moto.Identificador}");
             }
         }
 

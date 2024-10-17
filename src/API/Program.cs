@@ -4,7 +4,7 @@ using Data.Repositories;
 using Domain.Interfaces.Messaging;
 using Domain.Interfaces.Repositories;
 using Domain.Interfaces.Services;
-using Domain.Models;
+using Domain.Models.Settings;
 using Domain.Services;
 using Infrastructure.Messaging.Consumers;
 using Infrastructure.Service;
@@ -67,6 +67,8 @@ namespace API
 
 
             builder.Services.AddScoped<INotificationService, NotificationService>();
+            builder.Services.Configure<WebhookSettings>(Configuration.GetSection("WebhookSettings"));
+
             builder.Services.AddHostedService<MotoConsumer>();
 
             // Configurando o AutoMapper

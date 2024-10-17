@@ -2,7 +2,7 @@
 {
     public interface INotificationService
     {
-        void Notify(string message);
+        Task NotifyAsync(string message);
     }
 
 }
