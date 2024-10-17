@@ -1,5 +1,6 @@
 ﻿using Domain.Entities;
 using Domain.Interfaces.Repositories;
+using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace Data.Repositories
@@ -11,6 +12,19 @@ namespace Data.Repositories
         public LocacaoRepository(IMongoDatabase database) : base(database, COLLECTION_NAME)
         {
         }
-    }
 
+        public async Task<bool> TemLocacoesAtivasAsync(string identificadorMoto)
+        {
+            var pipeline = new[]
+            {
+                new BsonDocument("$match", new BsonDocument("moto_id", identificadorMoto)),
+                new BsonDocument("$match", new BsonDocument("Active", true)),
+                new BsonDocument("$count", "count")
+            };
+
+            var result = await _collection.Aggregate<BsonDocument>(pipeline).ToListAsync();
+
+            return result.Count > 0;
+        }
+    }
 }

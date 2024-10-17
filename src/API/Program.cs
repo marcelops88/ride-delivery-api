@@ -1,13 +1,18 @@
 using API.Configurations;
 using API.Configurations.Extensions;
 using Data.Repositories;
+using Domain.Interfaces.Messaging;
 using Domain.Interfaces.Repositories;
 using Domain.Interfaces.Services;
 using Domain.Models;
 using Domain.Services;
+using Infrastructure.Messaging.Consumers;
+using Infrastructure.Service;
+using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Interfaces;
 using Microsoft.OpenApi.Models;
+using RabbitMQ.Client;
 using Serilog;
 using Serilog.Formatting.Json;
 using System.Reflection;
@@ -26,6 +31,7 @@ namespace API
             ConfigureLogging();
             ConfigureServices(builder);
             AddServices(builder);
+            ConfigureRabbitMQ(builder);
 
             builder.Services.AddCors(options =>
             {
@@ -59,6 +65,10 @@ namespace API
             builder.Services.AddScoped<IEntregadorRepository, EntregadorRepository>();
             builder.Services.AddScoped<IMotoRepository, MotoRepository>();
 
+
+            builder.Services.AddScoped<INotificationService, NotificationService>();
+            builder.Services.AddHostedService<MotoConsumer>();
+
             // Configurando o AutoMapper
             builder.Services.AddAutoMapper(typeof(MappingProfile));
         }
@@ -77,6 +87,25 @@ namespace API
         {
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
+        }
+
+        private static void ConfigureRabbitMQ(WebApplicationBuilder builder)
+        {
+            builder.Services.Configure<RabbitMQSettings>(Configuration.GetSection("RabbitMQ"));
+
+            builder.Services.AddSingleton<IConnection>(provider =>
+            {
+                var rabbitMQSettings = provider.GetRequiredService<IOptions<RabbitMQSettings>>().Value;
+
+                var factory = new ConnectionFactory()
+                {
+                    HostName = rabbitMQSettings.Host,
+                    Port = rabbitMQSettings.Port,
+                    UserName = rabbitMQSettings.UserName,
+                    Password = rabbitMQSettings.Password
+                };
+                return factory.CreateConnection();
+            });
         }
 
         private static void ConfigureSwagger(WebApplicationBuilder builder)

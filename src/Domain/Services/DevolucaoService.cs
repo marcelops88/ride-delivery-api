@@ -2,37 +2,54 @@
 using Domain.Interfaces.Repositories;
 using Domain.Interfaces.Services;
 using Domain.Models.Outputs;
+using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 
 public class DevolucaoService : IDevolucaoService
 {
     private readonly ILocacaoRepository _locacaoRepository;
+    private readonly ILogger<DevolucaoService> _logger;
 
-    public DevolucaoService(ILocacaoRepository locacaoRepository)
+    public DevolucaoService(ILocacaoRepository locacaoRepository, ILogger<DevolucaoService> logger)
     {
         _locacaoRepository = locacaoRepository;
+        _logger = logger;
     }
 
     public async Task<DevolucaoOutput> ProcessarDevolucaoAsync(string identificadorLocacao, DateTime dataDevolucao)
     {
-        var locacao = _locacaoRepository.GetById(ObjectId.Parse(identificadorLocacao));
-
-        if (locacao == null)
-            throw new KeyNotFoundException("Locação não encontrada.");
-
-        var valorTotal = CalcularValorTotal(locacao, dataDevolucao, out decimal multa);
-
-        var devolucaoOutput = new DevolucaoOutput
+        try
         {
-            IdentificadorLocacao = locacao.Id.ToString(),
-            DataDevolucao = dataDevolucao,
-            ValorDiaria = ObterValorDiaria(locacao.Plano),
-            Multa = multa,
-            ValorTotal = valorTotal,
-            Mensagem = multa > 0 ? "Multa aplicada devido à devolução antecipada ou tardia." : "Devolução sem multa."
-        };
+            _logger.LogInformation("Tentando processar a devolução da locação com identificador: {IdentificadorLocacao} na data: {DataDevolucao}", identificadorLocacao, dataDevolucao);
 
-        return devolucaoOutput;
+            var locacao = _locacaoRepository.GetById(ObjectId.Parse(identificadorLocacao));
+
+            if (locacao == null)
+            {
+                _logger.LogWarning("Locação com identificador {IdentificadorLocacao} não encontrada.", identificadorLocacao);
+                throw new KeyNotFoundException("Locação não encontrada.");
+            }
+
+            var valorTotal = CalcularValorTotal(locacao, dataDevolucao, out decimal multa);
+
+            var devolucaoOutput = new DevolucaoOutput
+            {
+                IdentificadorLocacao = locacao.Id.ToString(),
+                DataDevolucao = dataDevolucao,
+                ValorDiaria = ObterValorDiaria(locacao.Plano),
+                Multa = multa,
+                ValorTotal = valorTotal,
+                Mensagem = multa > 0 ? "Multa aplicada devido à devolução antecipada ou tardia." : "Devolução sem multa."
+            };
+
+            _logger.LogInformation("Devolução processada com sucesso para a locação: {IdentificadorLocacao}", identificadorLocacao);
+            return devolucaoOutput;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Erro ao processar devolução para a locação com identificador {IdentificadorLocacao}.", identificadorLocacao);
+            throw;
+        }
     }
 
     private decimal CalcularValorTotal(Locacao locacao, DateTime dataDevolucao, out decimal multa)

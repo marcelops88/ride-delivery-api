@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Domain.Entities;
+using Domain.Interfaces.Messaging;
 using Domain.Interfaces.Repositories;
 using Domain.Interfaces.Services;
 using Domain.Models.Inputs;
@@ -11,14 +12,18 @@ namespace Domain.Services
     public class MotoService : IMotoService
     {
         private readonly IMotoRepository _motoRepository;
+        private readonly ILocacaoRepository _locacaoRepository;
         private readonly IMapper _mapper;
         private readonly ILogger<MotoService> _logger;
+        private readonly IProducer<Moto> _motoProducer;
 
-        public MotoService(IMotoRepository motoRepository, IMapper mapper, ILogger<MotoService> logger)
+        public MotoService(IMotoRepository motoRepository, IMapper mapper, ILogger<MotoService> logger, IProducer<Moto> motoProducer, ILocacaoRepository locacaoRepository)
         {
             _motoRepository = motoRepository;
             _mapper = mapper;
             _logger = logger;
+            _motoProducer = motoProducer;
+            _locacaoRepository = locacaoRepository;
         }
 
         public async Task<MotoOutput> CreateMotoAsync(MotoInput motoInput)
@@ -36,9 +41,10 @@ namespace Domain.Services
                 }
 
                 var moto = _mapper.Map<Moto>(motoInput);
-                _motoRepository.Add(moto);
 
-                _logger.LogInformation("Moto criada com sucesso: {Identificador}.", moto.Identificador);
+                _motoProducer.Publish(moto);
+
+                _logger.LogInformation("Moto publicada com sucesso: {Identificador}.", moto.Identificador);
                 return _mapper.Map<MotoOutput>(moto);
             }
             catch (Exception ex)
@@ -47,6 +53,7 @@ namespace Domain.Services
                 throw;
             }
         }
+
         public async Task DeleteMotoAsync(string identificador)
         {
             try
@@ -60,7 +67,11 @@ namespace Domain.Services
                     throw new Exception("Moto não encontrada.");
                 }
 
-                // adicionar a lógica de verificação se a moto está ativa ou tem locações
+                if (resultado.Moto.Active || await TemLocacoesAtivasAsync(resultado.Moto.Identificador))
+                {
+                    _logger.LogWarning("Não é possível remover a moto. A moto está ativa ou possui locações.");
+                    throw new Exception("Não é possível remover a moto. A moto está ativa ou possui locações.");
+                }
 
                 _motoRepository.Delete(resultado.Moto.Id);
                 _logger.LogInformation("Moto removida com sucesso: {Identificador}.", identificador);
@@ -70,6 +81,11 @@ namespace Domain.Services
                 _logger.LogError(ex, "Erro ao remover moto.");
                 throw;
             }
+        }
+
+        private async Task<bool> TemLocacoesAtivasAsync(string identificadorMoto)
+        {
+            return await _locacaoRepository.TemLocacoesAtivasAsync(identificadorMoto);
         }
 
         public IEnumerable<MotoOutput> GetAllMotos()
