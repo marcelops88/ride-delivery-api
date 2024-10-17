@@ -54,3 +54,4 @@ packages/
 /src/obj
 /obj
 /src/Tests/obj
+/src/Infrastructure/obj
