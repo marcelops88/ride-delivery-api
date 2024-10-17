@@ -13,6 +13,13 @@ namespace Data.Repositories
         {
         }
 
+        public async Task<Locacao> FindByIdentificadorAsync(string identificadorLocacao)
+        {
+            var filter = Builders<Locacao>.Filter.Eq(l => l.Identificador, identificadorLocacao);
+            var locacao = await _collection.Find(filter).FirstOrDefaultAsync();
+            return locacao;
+        }
+
         public async Task<bool> TemLocacoesAtivasAsync(string identificadorMoto)
         {
             var pipeline = new[]

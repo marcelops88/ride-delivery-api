@@ -5,7 +5,6 @@ using Domain.Interfaces.Services;
 using Domain.Models.Inputs;
 using Domain.Models.Outputs;
 using Microsoft.Extensions.Logging;
-using MongoDB.Bson;
 public class LocacaoService : ILocacaoService
 {
     private readonly ILocacaoRepository _locacaoRepository;
@@ -41,6 +40,8 @@ public class LocacaoService : ILocacaoService
 
             var locacaoOutput = _mapper.Map<LocacaoOutput>(locacao);
 
+            locacaoOutput.ValorDiaria = ValorDiaria(locacaoInput.Plano);
+
             return locacaoOutput;
         }
         catch (Exception ex)
@@ -54,7 +55,7 @@ public class LocacaoService : ILocacaoService
     {
         try
         {
-            var locacao = _locacaoRepository.GetById(ObjectId.Parse(identificadorLocacao));
+            var locacao = await _locacaoRepository.FindByIdentificadorAsync(identificadorLocacao);
             if (locacao == null)
             {
                 _logger.LogWarning("Locação não encontrada: {IdentificadorLocacao}", identificadorLocacao);
@@ -62,7 +63,11 @@ public class LocacaoService : ILocacaoService
             }
 
             _logger.LogInformation("Locação encontrada: {IdentificadorLocacao}", identificadorLocacao);
-            return _mapper.Map<LocacaoOutput>(locacao);
+
+            var locacaoOutput = _mapper.Map<LocacaoOutput>(locacao);
+            locacaoOutput.ValorDiaria = ValorDiaria(locacao.Plano);
+
+            return locacaoOutput;
         }
         catch (Exception ex)
         {
@@ -73,15 +78,7 @@ public class LocacaoService : ILocacaoService
 
     private decimal CalcularValorTotal(LocacaoInput locacaoInput)
     {
-        decimal valorDiaria = locacaoInput.Plano switch
-        {
-            7 => 30m,
-            15 => 28m,
-            30 => 22m,
-            45 => 20m,
-            50 => 18m,
-            _ => throw new InvalidOperationException("Plano de locação inválido."),
-        };
+        decimal valorDiaria = ValorDiaria(locacaoInput.Plano);
 
         DateTime dataInicioReal = DateTime.Now.AddDays(1);
         int diasDeLocacao = (locacaoInput.DataTermino - dataInicioReal).Days + 1;
@@ -92,5 +89,18 @@ public class LocacaoService : ILocacaoService
         }
 
         return valorDiaria * diasDeLocacao;
+    }
+    private decimal ValorDiaria(int plano)
+    {
+        return
+            plano switch
+            {
+                7 => 30m,
+                15 => 28m,
+                30 => 22m,
+                45 => 20m,
+                50 => 18m,
+                _ => throw new InvalidOperationException("Plano de locação inválido."),
+            };
     }
 }

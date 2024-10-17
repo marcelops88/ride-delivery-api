@@ -5,7 +5,6 @@ using AutoMapper;
 using Domain.Interfaces.Services;
 using Domain.Models.Inputs;
 using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
 
 [ApiController]
 [ApiV1Route("[controller]")]
@@ -54,18 +53,18 @@ public class LocacaoController : ControllerBase
     /// <response code="200">Retorna os detalhes da locação.</response>
     /// <response code="400">Identificador da locação inválido ou ausente.</response>
     /// <response code="404">Locação não encontrada.</response>
-    [HttpGet("{id}")]
+    [HttpGet("{identificador}")]
     [ProducesResponseType(typeof(LocacaoResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status400BadRequest)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> GetLocacaoById([FromRoute][Required] string identificadorLocacao)
+    public async Task<IActionResult> GetLocacaoById([FromRoute] string identificador)
     {
-        if (string.IsNullOrEmpty(identificadorLocacao))
+        if (string.IsNullOrEmpty(identificador))
         {
             return BadRequest(new ErrorResponse { Message = "O identificador da locação é obrigatório." });
         }
 
-        var locacao = await _locacaoService.FindByIdAsync(identificadorLocacao);
+        var locacao = await _locacaoService.FindByIdAsync(identificador);
         if (locacao == null)
         {
             return NotFound(new ErrorResponse { Message = "Locação não encontrada." });
@@ -83,14 +82,14 @@ public class LocacaoController : ControllerBase
     /// <returns>Retorna os detalhes da devolução, incluindo o valor total e multas, se houver.</returns>
     /// <response code="200">Devolução processada com sucesso. Retorna os detalhes da locação e o valor total a ser pago.</response>
     /// <response code="404">Locação não encontrada com o identificador fornecido.</response>
-    [HttpPost("{identificadorLocacao}/devolucao")]
+    [HttpPost("{identificador}/devolucao")]
     [ProducesResponseType(typeof(DevolucaoResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(ErrorResponse), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> DevolverMoto(string identificadorLocacao, [FromBody] DateTime dataDevolucao)
+    public async Task<IActionResult> DevolverMoto(string identificador, [FromBody] DateTime dataDevolucao)
     {
         try
         {
-            var devolucaoOutput = await _devolucaoService.ProcessarDevolucaoAsync(identificadorLocacao, dataDevolucao);
+            var devolucaoOutput = await _devolucaoService.ProcessarDevolucaoAsync(identificador, dataDevolucao);
 
             var locacaoResponse = _mapper.Map<DevolucaoResponse>(devolucaoOutput);
 

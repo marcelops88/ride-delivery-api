@@ -4,6 +4,9 @@ namespace Domain.Entities
 {
     public class Locacao : EntityBase
     {
+        [BsonElement("identificador")]
+        public string Identificador { get; set; }
+
         [BsonElement("entregador_id")]
         public string IdentificadorEntregador { get; set; }
 

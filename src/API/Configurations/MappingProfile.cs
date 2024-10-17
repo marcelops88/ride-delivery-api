@@ -53,6 +53,15 @@ namespace API.Configurations
                 .ForMember(dest => dest.Active, opt => opt.MapFrom(src => true))
                 .ForMember(dest => dest.Version, opt => opt.MapFrom(src => 1));
 
+            CreateMap<Entregador, EntregadorOutput>()
+                .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.Id.ToString()))
+                .ForMember(dest => dest.Cnpj, opt => opt.MapFrom(src => src.CNPJ));
+
+            CreateMap<Locacao, LocacaoOutput>()
+                .ForMember(dest => dest.DataTermino, opt => opt.MapFrom(src => src.DataTermino ?? DateTime.MinValue))
+                .ForMember(dest => dest.ValorDiaria, opt => opt.Ignore())
+                .ForMember(dest => dest.DataDevolucao, opt => opt.Ignore());
+
         }
     }
 }

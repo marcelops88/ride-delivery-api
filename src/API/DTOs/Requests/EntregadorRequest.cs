@@ -8,6 +8,10 @@ namespace API.DTOs.Requests
         private const string CnpjPattern = @"^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$";
         private const string NumeroCNHPattern = @"^[0-9]{11,12}$";
 
+        public string Identificador { get; set; }
+
+        public string Nome { get; set; }
+
         [Required(ErrorMessage = "O CNPJ é obrigatório.")]
         [RegularExpression(CnpjPattern, ErrorMessage = "O CNPJ deve estar no formato XX.XXX.XXX/XXXX-XX.")]
         public string Cnpj { get; set; }
