@@ -69,7 +69,7 @@ namespace Tests.Domain.Services
             // Assert
             Assert.NotNull(result);
             Assert.Equal(entregador.Identificador, result.Identificador);
-             _entregadorRepository.Received(1).Add(entregador);
+            _entregadorRepository.Received(1).Add(entregador);
         }
 
         [Fact]
@@ -100,7 +100,7 @@ namespace Tests.Domain.Services
 
             // Assert
             Assert.Equal(caminhoImagem, entregador.ImagemCNH);
-             _entregadorRepository.Received(1).Update(entregador);
+            _entregadorRepository.Received(1).Update(entregador);
         }
     }
 

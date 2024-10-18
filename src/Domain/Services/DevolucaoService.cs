@@ -3,7 +3,6 @@ using Domain.Interfaces.Repositories;
 using Domain.Interfaces.Services;
 using Domain.Models.Outputs;
 using Microsoft.Extensions.Logging;
-using MongoDB.Bson;
 
 public class DevolucaoService : IDevolucaoService
 {

@@ -3,14 +3,14 @@ using Bogus;
 using Domain.Entities;
 using Domain.Interfaces.Messaging;
 using Domain.Interfaces.Repositories;
+using Domain.Models;
 using Domain.Models.Inputs;
 using Domain.Models.Outputs;
-using Microsoft.Extensions.Logging;
-using NSubstitute;
-using FluentAssertions;
 using Domain.Services;
+using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
-using Domain.Models;
+using NSubstitute;
 
 namespace Tests.Domain.Services
 {
@@ -99,7 +99,7 @@ namespace Tests.Domain.Services
             _motoRepository.FindByIdentificadorOrPlacaAsync(identificador, null)
                       .Returns(new MotoPlaca { Moto = moto });
 
-            _locacaoRepository.TemLocacoesAtivasAsync(identificador).Returns(true); 
+            _locacaoRepository.TemLocacoesAtivasAsync(identificador).Returns(true);
 
             // Act
             Func<Task> act = async () => await _motoService.DeleteMotoAsync(identificador);

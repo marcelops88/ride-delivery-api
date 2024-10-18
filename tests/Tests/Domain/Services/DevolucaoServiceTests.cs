@@ -31,12 +31,12 @@ namespace Tests.Domain.Services
             var locacao = new Locacao
             {
                 Identificador = "teste",
-                DataInicio = DateTime.Now.AddDays(-10), 
+                DataInicio = DateTime.Now.AddDays(-10),
                 DataPrevisaoTermino = DateTime.Now.AddDays(-5),
-                Plano = 7 
+                Plano = 7
             };
 
-            var expectedMulta = 50M; 
+            var expectedMulta = 50M;
 
             var locacaoRepository = Substitute.For<ILocacaoRepository>();
             locacaoRepository.FindByIdentificadorAsync(Arg.Any<string>()).Returns(locacao);
@@ -46,11 +46,11 @@ namespace Tests.Domain.Services
             var devolucaoService = new DevolucaoService(locacaoRepository, logger);
 
             // Act
-            var result = await devolucaoService.ProcessarDevolucaoAsync(locacao.Id.ToString(), DateTime.Now.AddDays(-4)); 
+            var result = await devolucaoService.ProcessarDevolucaoAsync(locacao.Id.ToString(), DateTime.Now.AddDays(-4));
 
             // Assert
-            result.Multa.Should().Be(expectedMulta); 
-            result.ValorTotal.Should().BeGreaterThan(0); 
+            result.Multa.Should().Be(expectedMulta);
+            result.ValorTotal.Should().BeGreaterThan(0);
         }
 
         [Fact]

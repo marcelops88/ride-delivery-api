@@ -90,7 +90,7 @@ namespace Domain.Services.Tests
             // Arrange
             string identificador = "entregador1";
             string base64ImagemCNH = "data:image/bmp;base64,Qk1eAfZrWq0AAAAAAwAAAAAABAAAAAAAABAAAAAAABAAAAABAAEAAABAABQAAAAAABAAAAAAAABAAAAAQAABAAAAAQAABAAAAAAAABAAAAAQAABAAAAAAABAAAAAQAABAAAAAAABAAAAAAABAAA="; // Exemplo válido de BMP
-            
+
             string directoryPath = Path.Combine(Directory.GetCurrentDirectory(), "Images");
 
             string nomeArquivoEsperado = $"{identificador}_CNH.png";

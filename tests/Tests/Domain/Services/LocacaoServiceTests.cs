@@ -40,7 +40,7 @@ namespace Tests.Domain.Services
                 .RuleFor(l => l.DataTermino, f => f.Date.Future());
 
             _locacaoFaker = new Faker<Locacao>()
-                .RuleFor(l => l.Id, f => ObjectId.GenerateNewId()) 
+                .RuleFor(l => l.Id, f => ObjectId.GenerateNewId())
                 .RuleFor(l => l.Plano, f => f.PickRandom(new[] { 7, 15, 30, 45, 50 }))
                 .RuleFor(l => l.ValorTotal, f => f.Finance.Amount(100, 1000));
         }
@@ -52,7 +52,7 @@ namespace Tests.Domain.Services
             var locacaoInput = _locacaoInputFaker.Generate();
             var locacao = _locacaoFaker.Generate();
             locacaoInput.Plano = 7;
-            locacao.ValorTotal = locacaoInput.Plano * 30; 
+            locacao.ValorTotal = locacaoInput.Plano * 30;
 
             var locacaoOutput = new LocacaoOutput
             {
@@ -68,7 +68,7 @@ namespace Tests.Domain.Services
 
             // Assert
             result.Should().NotBeNull();
-            result.ValorDiaria.Should().Be(30m); 
+            result.ValorDiaria.Should().Be(30m);
 
             _locacaoRepositoryMock.Received(1).Add(locacao);
         }
@@ -78,7 +78,7 @@ namespace Tests.Domain.Services
         {
             // Arrange
             var locacaoInput = _locacaoInputFaker.Generate();
-            locacaoInput.DataTermino = DateTime.Now.AddDays(-1); 
+            locacaoInput.DataTermino = DateTime.Now.AddDays(-1);
 
             // Act
             Func<Task> act = async () => await _locacaoService.CreateLocacaoAsync(locacaoInput);
