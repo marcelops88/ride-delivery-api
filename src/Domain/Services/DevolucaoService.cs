@@ -66,20 +66,22 @@ public class DevolucaoService : IDevolucaoService
 
             if (locacao.Plano == 7)
                 multa = 0.20m * (diasRestantes * valorDiaria);
-            else if (locacao.Plano == 15)
+            if (locacao.Plano == 15)
                 multa = 0.40m * (diasRestantes * valorDiaria);
 
             return valorTotalBase - (diasRestantes * valorDiaria) + multa;
         }
-        else if (dataDevolucao > locacao.DataPrevisaoTermino)
+
+        if (dataDevolucao > locacao.DataPrevisaoTermino)
         {
             int diasAdicionais = (dataDevolucao - locacao.DataPrevisaoTermino).Days;
-            decimal multaAdicional = diasAdicionais * 50;
+            multa = diasAdicionais * 50;
 
-            return valorTotalBase + multaAdicional;
+            return valorTotalBase + multa;
         }
         return valorTotalBase;
     }
+
 
     private decimal ObterValorDiaria(int plano)
     {

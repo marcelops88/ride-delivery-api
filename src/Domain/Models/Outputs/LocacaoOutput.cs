@@ -9,7 +9,7 @@
         public DateTime DataInicio { get; set; }
         public DateTime DataTermino { get; set; }
         public DateTime DataPrevisaoTermino { get; set; }
-        public DateTime DataDevolucao { get; set; }
+        public DateTime? DataDevolucao { get; set; }
 
     }
 }
