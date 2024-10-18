@@ -55,3 +55,7 @@ packages/
 /obj
 /src/Tests/obj
 /src/Infrastructure/obj
+/tests/Tests/obj/project.assets.json
+/tests/Tests/obj/project.nuget.cache
+/tests/Tests/obj/Tests.csproj.nuget.dgspec.json
+/tests/Tests/obj/Tests.csproj.nuget.g.props
