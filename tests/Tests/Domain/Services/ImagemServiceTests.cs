@@ -1,12 +1,7 @@
-﻿using Domain.Interfaces.Services;
-using Domain.Models.Settings;
+﻿using Domain.Models.Settings;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NSubstitute;
-using System;
-using System.IO;
-using System.Threading.Tasks;
-using Xunit;
 
 namespace Domain.Services.Tests
 {
@@ -94,21 +89,33 @@ namespace Domain.Services.Tests
         {
             // Arrange
             string identificador = "entregador1";
-            string base64ImagemCNH = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAA..."; // Simule um PNG válido
-            string directoryPath = Path.Combine(Directory.GetCurrentDirectory(), "TestImages");
+            string base64ImagemCNH = "data:image/bmp;base64,Qk1eAfZrWq0AAAAAAwAAAAAABAAAAAAAABAAAAAAABAAAAABAAEAAABAABQAAAAAABAAAAAAAABAAAAAQAABAAAAAQAABAAAAAAAABAAAAAQAABAAAAAAABAAAAAQAABAAAAAAABAAAAAAABAAA="; // Exemplo válido de BMP
+            
+            string directoryPath = Path.Combine(Directory.GetCurrentDirectory(), "Images");
 
-            // Altera a configuração do diretório para um diretório temporário para o teste
+            string nomeArquivoEsperado = $"{identificador}_CNH.png";
+            string caminhoCompletoEsperado = Path.Combine(directoryPath, nomeArquivoEsperado);
+
             var storageSettings = new StorageSettings { ImageDirectory = directoryPath };
             _options.Value.Returns(storageSettings);
 
             // Act
             await _imagemService.SalvarImagemCNHAsync(identificador, base64ImagemCNH);
 
-            // Assert
-            Assert.True(Directory.Exists(directoryPath), "O diretório não foi criado.");
+            bool directoryExists = Directory.Exists(directoryPath);
+            Console.WriteLine("O diretório foi criado: " + directoryExists);
 
-            // Cleanup
-            Directory.Delete(directoryPath, true);
+            // Assert
+            Assert.True(directoryExists, "O diretório não foi criado.");
+
+            bool arquivoExiste = File.Exists(caminhoCompletoEsperado);
+            Assert.True(arquivoExiste, $"A imagem não foi salva no caminho esperado: {caminhoCompletoEsperado}");
+
+            if (directoryExists)
+            {
+                Directory.Delete(directoryPath, true);
+            }
         }
+
     }
 }

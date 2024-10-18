@@ -22,7 +22,7 @@ public class DevolucaoService : IDevolucaoService
         {
             _logger.LogInformation("Tentando processar a devolução da locação com identificador: {IdentificadorLocacao} na data: {DataDevolucao}", identificadorLocacao, dataDevolucao);
 
-            var locacao = _locacaoRepository.GetById(ObjectId.Parse(identificadorLocacao));
+            var locacao = await _locacaoRepository.FindByIdentificadorAsync(identificadorLocacao);
 
             if (locacao == null)
             {
